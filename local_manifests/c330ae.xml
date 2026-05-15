@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Local manifest for Rakuten Mini (c330ae / SDM439)
+  Target: crDroid 11 (Android 15 / lineage-22.2)
+
+  Place this file (or symlink) at:
+    <ANDROID_SOURCE_ROOT>/.repo/local_manifests/c330ae.xml
+  then run: repo sync -c -j$(nproc) --force-sync --no-clone-bundle --no-tags
+-->
+<manifest>
+
+  <!-- ── Device tree ───────────────────────────────────────────────── -->
+  <project
+    name="2by2-Project-Devices/android_device_rakuten_c330ae"
+    path="device/rakuten/c330ae"
+    remote="github"
+    revision="lineage-22.2" />
+
+  <!-- ── Kernel tree ───────────────────────────────────────────────── -->
+  <project
+    name="2by2-Project-Devices/android_kernel_rakuten_sdm439"
+    path="kernel/rakuten/sdm439"
+    remote="github"
+    revision="lineage-22.2" />
+
+  <!-- ── Vendor (proprietary blobs) ───────────────────────────────── -->
+  <project
+    name="2by2-Project-Devices/proprietary_vendor_rakuten_c330ae"
+    path="vendor/rakuten/c330ae"
+    remote="github"
+    revision="lineage-22.2" />
+
+</manifest>

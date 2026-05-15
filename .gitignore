@@ -1,0 +1,7 @@
+# Android source tree (別ディレクトリで管理)
+android/
+
+# Nix
+result
+result-*
+.direnv/
