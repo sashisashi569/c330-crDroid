@@ -5,3 +5,12 @@ android/
 result
 result-*
 .direnv/
+
+# Build logs and runtime files
+build.log
+build.pid
+setup.log
+sync.log
+
+# Documentation drafts
+c330-2by2-doc.md
