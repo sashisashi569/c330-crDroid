@@ -163,6 +163,8 @@
 
             # ── Android build helpers ─────────────────────────────────────────
             export ALLOW_MISSING_DEPENDENCIES=true
+            export BUILD_USERNAME=sashisashi569
+            export BUILD_HOSTNAME=github
 
             # ── NixOS fix: expose GCC crt files (crtbeginS.o, libgcc …) to
             #    the prebuilt Android lld.  BoardConfigKernel.mk passes
