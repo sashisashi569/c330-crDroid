@@ -17,3 +17,4 @@ c330-2by2-doc.md
 
 # Release artifacts (upload to GitHub Releases, not committed to git)
 releases/**/*.zip
+releases/ksu/

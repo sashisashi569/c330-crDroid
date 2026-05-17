@@ -79,20 +79,10 @@ do_sync() {
 
 # ── Step 4: build ─────────────────────────────────────────────────────────────
 do_build() {
-  local ksu="${WITH_KSU:-false}"
-  local product
-
   # Android 15 lunch format: <product>-<release>-<variant>
   local release
   release="$(cat "$ANDROID_DIR/vendor/lineage/vars/aosp_target_release" 2>/dev/null || echo bp1a)"
-
-  if [ "$ksu" = "true" ]; then
-    product="lineage_${DEVICE}_ksu-${release}-user"
-    info "KernelSU: enabled (product: $product)"
-  else
-    product="lineage_${DEVICE}-${release}-user"
-    info "KernelSU: disabled (product: $product)"
-  fi
+  local product="lineage_${DEVICE}-${release}-user"
 
   cd "$ANDROID_DIR"
   info "Setting up build environment…"
