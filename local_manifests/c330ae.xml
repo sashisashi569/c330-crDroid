@@ -3,14 +3,14 @@
 
   <!-- Device tree: Rakuten Mini (c330ae / SDM439) -->
   <project
-    name="2by2-Project-Devices/android_device_rakuten_c330ae"
+    name="sashisashi569/android_device_rakuten_c330ae"
     path="device/rakuten/c330ae"
     remote="github"
     revision="lineage-22.2" />
 
   <!-- Kernel tree -->
   <project
-    name="2by2-Project-Devices/android_kernel_rakuten_sdm439"
+    name="sashisashi569/android_kernel_rakuten_sdm439"
     path="kernel/rakuten/sdm439"
     remote="github"
     revision="lineage-22.2" />
