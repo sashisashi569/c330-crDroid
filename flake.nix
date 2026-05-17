@@ -17,6 +17,22 @@
         # Android 15 requires JDK 17
         jdk = pkgs.jdk17;
 
+        # Derivation that places GCC crt files (crtbeginS.o, libgcc …) under
+        # lib/x86_64-linux-gnu/ so ld.lld can find them.
+        # BoardConfigKernel.mk sets HOSTLDFLAGS="-L/usr/lib/x86_64-linux-gnu …",
+        # and buildFHSEnv maps $pkg/lib/ → /usr/lib/ in the FHS tree.
+        gccCrtSymlinks = pkgs.runCommand "gcc-crt-symlinks-for-lld" {
+          nativeBuildInputs = [ pkgs.gcc ];
+        } ''
+          mkdir -p $out/lib/x86_64-linux-gnu
+          gcc_lib=$(gcc --print-file-name=crtbeginS.o | xargs dirname)
+          for f in crtbegin.o crtbeginS.o crtbeginT.o \
+                   crtend.o crtendS.o \
+                   libgcc.a libgcc_eh.a libgcov.a; do
+            [ -e "$gcc_lib/$f" ] && ln -s "$gcc_lib/$f" "$out/lib/x86_64-linux-gnu/$f" || true
+          done
+        '';
+
         # Packages available inside the FHS environment
         fhsPackages = fhsPkgs: with fhsPkgs; [
           # Java
@@ -64,6 +80,13 @@
           readline.dev
           expat
           libffi
+          # libcrypt.so.1 (legacy ABI) — needed by prebuilt Perl in kernel build
+          # Modern libxcrypt provides .so.2; prebuilt Android tools expect .so.1
+          libxcrypt-legacy
+
+          # kmod provides /sbin/depmod — required by kernel's modules_install target
+          # to generate modules.order / modules.builtin before AOSP's depmod step
+          kmod
 
           # AOSP-specific build deps
           bison
@@ -100,6 +123,7 @@
           gnused
           gawk
           ccache
+          android-tools
 
           # Image manipulation (signapk / pngcrush)
           pngcrush
@@ -110,7 +134,7 @@
 
           # Networking (for repo sync)
           nettools
-        ];
+        ] ++ [ gccCrtSymlinks ];
 
         # FHS environment that mimics Ubuntu — required for AOSP / crDroid
         fhsEnv = pkgs.buildFHSEnv {
@@ -120,6 +144,7 @@
 
           # Extra paths that Android build tools look for
           extraOutputsToInstall = [ "dev" "lib" ];
+
 
           profile = ''
             # ── Java ──────────────────────────────────────────────────────────
@@ -138,6 +163,21 @@
 
             # ── Android build helpers ─────────────────────────────────────────
             export ALLOW_MISSING_DEPENDENCIES=true
+
+            # ── NixOS fix: expose GCC crt files (crtbeginS.o, libgcc …) to
+            #    the prebuilt Android lld.  BoardConfigKernel.mk passes
+            #    HOSTLDFLAGS="-L/usr/lib/x86_64-linux-gnu … -fuse-ld=lld".
+            #    The prebuilt clang honours LIBRARY_PATH and forwards its
+            #    directories as -L flags to lld, so setting it here is enough.
+            _gcc_crt_dir=$(gcc --print-file-name=crtbeginS.o 2>/dev/null | xargs dirname 2>/dev/null)
+            if [ -n "$_gcc_crt_dir" ] && [ "$_gcc_crt_dir" != "." ]; then
+              if [ -n "$LIBRARY_PATH" ]; then
+                export LIBRARY_PATH="$_gcc_crt_dir:$LIBRARY_PATH"
+              else
+                export LIBRARY_PATH="$_gcc_crt_dir"
+              fi
+            fi
+            unset _gcc_crt_dir
 
             # ── repo tool (downloaded per-user if not already present) ─────────
             if [ ! -f "$HOME/bin/repo" ]; then
